@@ -1,54 +1,29 @@
-# import pytest
-from src.models.ingredient import Ingredient
+from src.models.ingredient import Ingredient, Restriction
 
 
-def test_instantiate_ingredient_with_valid_arguments():
-    ingredient = Ingredient("Tomato")
-    assert isinstance(ingredient, Ingredient)
-
-
-def test_check_ingredient_name():
-    name = "Tomato"
-    ingredient = Ingredient(name)
-    assert ingredient.name == name
-
-
-def test_verify_ingredient_restrictions():
-    restrictions = {"vegetarian", "gluten-free"}
-    ingredient = Ingredient("Tomato")
-    assert ingredient.restrictions == restrictions
-
-
-def test_representation_of_ingredient():
-    ingredient = Ingredient("Tomato")
-    expected_repr = "Ingredient(name='Tomato')"
-    assert repr(ingredient) == expected_repr
-
-
-def test_compare_two_equal_ingredients():
-    ingredient1 = Ingredient("Tomato")
-    ingredient2 = Ingredient("Tomato")
-    assert ingredient1 == ingredient2
-
-
-def test_verify_hash_of_ingredient():
-    ingredient1 = Ingredient("Tomato")
-    ingredient2 = Ingredient("Tomato")
-    assert hash(ingredient1) == hash(ingredient2)
-
-
-def test_compare_hash_of_different_ingredients():
-    ingredient1 = Ingredient("Tomato")
-    ingredient2 = Ingredient("Onion")
-    assert hash(ingredient1) != hash(ingredient2)
-
-
-def test_compare_different_ingredients():
-    ingredient1 = Ingredient("Tomato")
-    ingredient2 = Ingredient("Onion")
+def test_ingredient():
+    ingredient1 = Ingredient("queijo provolone")
+    ingredient2 = Ingredient("massa de lasanha")
     assert ingredient1 != ingredient2
-
-
-def test_representation_of_ingredient_incorrect():
-    ingredient = Ingredient("Tomato")
-    assert repr(ingredient) != "Ingredient(name='Tomato')"
+    ingredient1 = Ingredient("salmão")
+    ingredient2 = Ingredient("salmão")
+    assert hash(ingredient1) == hash(ingredient2)
+    ingredient1 = Ingredient("frango")
+    ingredient2 = Ingredient("frango")
+    assert ingredient1 == ingredient2
+    ingredient1 = Ingredient("carne")
+    ingredient2 = Ingredient("creme de leite")
+    assert not ingredient1 == ingredient2
+    ingredient1 = Ingredient("bacon")
+    assert ingredient1.name == "bacon"
+    assert ingredient1.restrictions == {
+        Restriction.ANIMAL_MEAT,
+        Restriction.ANIMAL_DERIVED,
+    }
+    ingredient1 = Ingredient("caldo de carne")
+    assert repr(ingredient1) == "Ingredient('caldo de carne')"
+    ingredient1 = Ingredient("massa de lasanha")
+    ingredient2 = Ingredient("ovo")
+    assert not hash(ingredient1) == hash(ingredient2)
+    ingredient1 = Ingredient("massa de lasanha")
+    assert ingredient1.restrictions != {Restriction.ANIMAL_DERIVED}

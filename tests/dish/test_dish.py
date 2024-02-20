@@ -1,53 +1,48 @@
 import pytest
 from src.models.dish import Dish
+from src.models.ingredient import Ingredient, Restriction
 
 
-def test_dish_instantiation():
-    dish = Dish(
-        "Lasanha", 15.99, {"Massa": 200, "Molho de Tomate": 150, "Queijo": 100}
-    )
-    assert dish.name == "Lasanha"
-    assert dish.price == 15.99
-    assert dish.recipe == {"Massa": 200, "Molho de Tomate": 150, "Queijo": 100}
+def test_dish():
+    dish1 = Dish("Coxinha", 6.50)
+    assert isinstance(dish1, Dish)
+    assert dish1.name == "Coxinha"
+    assert dish1.price == 6.50
 
-
-def test_dish_equality():
-    dish1 = Dish(
-        "Lasanha", 15.99, {"Massa": 200, "Molho de Tomate": 150, "Queijo": 100}
-    )
-    dish2 = Dish(
-        "Lasanha", 15.99, {"Massa": 200, "Molho de Tomate": 150, "Queijo": 100}
-    )
+    dish2 = Dish("Coxinha", 6.50)
     assert dish1 == dish2
-
-
-@pytest.mark.xfail(strict=True)
-def test_dish_name_mismatch():
-    dish1 = Dish(
-        "Lasanha", 15.99, {"Massa": 200, "Molho de Tomate": 150, "Queijo": 100}
-    )
-    dish2 = Dish(
-        "Pizza", 15.99, {"Massa": 200, "Molho de Tomate": 150, "Queijo": 100}
-    )
-    assert dish1 == dish2
-
-
-@pytest.mark.xfail(strict=True)
-def test_dish_hash_mismatch():
-    dish1 = Dish(
-        "Lasanha", 15.99, {"Massa": 200, "Molho de Tomate": 150, "Queijo": 100}
-    )
-    dish2 = Dish(
-        "Lasanha", 15.99, {"Massa": 200, "Molho de Tomate": 150, "Queijo": 100}
-    )
     assert hash(dish1) == hash(dish2)
 
+    dish3 = Dish("Pizza", 49.90)
+    assert dish1 != dish3
+    assert hash(dish1) != hash(dish3)
 
-def test_dish_equality_different_objects():
-    dish1 = Dish(
-        "Lasanha", 15.99, {"Massa": 200, "Molho de Tomate": 150, "Queijo": 100}
-    )
-    dish2 = Dish(
-        "Pizza", 15.99, {"Massa": 200, "Molho de Tomate": 150, "Queijo": 100}
-    )
-    assert dish1 != dish2  # Verifica se os pratos são diferentes
+    assert repr(dish1) == f"Dish('Coxinha', R${dish1.price:.2f})"
+
+    with pytest.raises(TypeError):
+        Dish(dish1.name, "6.50")
+
+    with pytest.raises(ValueError):
+        Dish(dish1.name, -6.50)
+
+    ingredient1 = Ingredient("bacon")
+    dish1.add_ingredient_dependency(ingredient1, 2)
+    assert dish1.recipe.get(ingredient1) == 2
+
+    assert dish1.get_restrictions() == {
+        Restriction.ANIMAL_MEAT,
+        Restriction.ANIMAL_DERIVED,
+    }
+
+    assert dish1.get_ingredients() == {ingredient1}
+
+    assert dish1.recipe.get(ingredient1) == 2
+
+    with pytest.raises(AssertionError):
+        assert dish1.name == "Pizza"
+
+    with pytest.raises(AssertionError):
+        assert hash(dish1) == hash(dish3)
+
+    with pytest.raises(AssertionError):
+        assert dish1 == dish3
